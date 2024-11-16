@@ -9,7 +9,7 @@ app = Flask(__name__)
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 def get_db_connection():
-    conn = psycopg2.connect(DATABASE_URL)
+    conn = psycopg2.connect(DATABASE_URL, client_encoding='utf8')
     return conn
 
 # Initialisation de la base de données
