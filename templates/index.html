@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bibliothèque</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+        header {
+            background-color: #0077b6;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 800;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        .section h2 {
+            color: #0077b6;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #0077b6;
+            color: white;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background-color: #005f89;
+        }
+        .book-list,
+        .reader-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-gap: 30px;
+        }
+        .book-card,
+        .reader-card {
+            background-color: #f7f7f7;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .book-card h3,
+        .reader-card h3 {
+            color: #0077b6;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .book-card p,
+        .reader-card p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        Bibliothèque
+    </header>
+
+    <div class="container">
+
+        <!--section des livres -->
+
+        <div class="section">
+
+            <h2>Liste des Livres</h2>
+
+            <div class="book-list">
+                {% for livre in livres %}
+                <div class="book-card">
+                    <h3>{{ livre[1] }}</h3>
+                    <p>Auteur : {{ livre[2] }}</p>
+                    <p>Année : {{ livre[3] }}</p>
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+
+        <!--section pour les lecteurs-->
+
+        <div class="section">
+
+            <h2>Liste des Lecteurs</h2>
+            
+            <div class="reader-list">
+                {% for lecteur in lecteurs %}
+                <div class="reader-card">
+                    <h3>{{ lecteur[1] }} {{ lecteur[2] }}</h3>
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+
+        <!--form pour emprunter un livre-->
+
+        <div class="section">
+
+            <h2>Emprunter un Livre</h2>
+
+            <form id="empruntForm">
+
+                <div class="form-group">
+                    <label for="id_livre">ID du Livre</label>
+                    <input type="number" id="id_livre" name="id_livre" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_lecteur">ID du Lecteur</label>
+                    <input type="number" id="id_lecteur" name="id_lecteur" required>
+                </div>
+
+                <button type="submit" class="btn">Emprunter</button>
+
+            </form>
+        </div>
+
+
+        <!--formulaire pour retourner un livre-->
+
+        <div class="section">
+
+            <h2>Retourner un Livre</h2>
+
+            <form id="retourForm">
+
+                <div class="form-group">
+                    <label for="id_livre_retour">ID du Livre</label>
+                    <input type="number" id="id_livre_retour" name="id_livre_retour" required>
+                </div>
+
+                <button type="submit" class="btn">Retourner</button>
+
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Gestion de l'emprunt de livres
+        document.getElementById('empruntForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id_livre = document.getElementById('id_livre').value;
+            const id_lecteur = document.getElementById('id_lecteur').value;
+
+            fetch('/emprunter', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id_livre, id_lecteur })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => alert('Erreur lors de l\'emprunt du livre.'));
+        });
+
+        // Gestion du retour de livres
+        document.getElementById('retourForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id_livre_retour = document.getElementById('id_livre_retour').value;
+
+            fetch(`/retourner/${id_livre_retour}`, {
+                method: 'PUT',
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => alert('Erreur lors du retour du livre.'));
+        });
+    </script>
+</body>
+</html>
